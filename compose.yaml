@@ -3,69 +3,61 @@ services:
   backend:
     ports:
       - "48080:8080"
-    # depends_on:
-    #   db:
-    #     condition: service_healthy
+    depends_on:
+      db:
+        condition: service_healthy
     restart: on-failure
     tty: true
     container_name: go-backend
     build:
       context: ./docker/go
       dockerfile: Dockerfile
-    # env_file: # .envファイル
-    #   - ./docker/go/.go_env
     volumes:
       - "./src:/go"
-    # command: >
-    #     sh -c '
-    #     go mod init go-test &&
-    #     go get github.com/gin-gonic/gin &&
-    #     go run main.go
-    #     '
-  # db:
-  #   container_name: db_go
-  #   build: ./docker/db
-  #   platform: linux/amd64
-  #   ports:
-  #     - "43306:3306"
-  #   environment:
-  #     MYSQL_DATABASE: tweeter
-  #     MYSQL_ROOT_PASSWORD: root
-  #   volumes:
-  #     - "./docker/.data/log:/var/log/mysqllog"
-  #     - "./docker/db/tables:/docker-entrypoint-initdb.d"
-  #   restart: on-failure
-  #   healthcheck:
-  #     test:
-  #       [
-  #         "CMD",
-  #         "mysqladmin",
-  #         "ping",
-  #         "-h",
-  #         "localhost",
-  #         "-u",
-  #         "root",
-  #         "-proot"
-  #       ]
-  #     interval: 5s
-  #     retries: 5
-  # phpmyadmin:
-  #   container_name: tweeter-phpmyadmin_go
-  #   image: phpmyadmin
-  #   restart: on-failure
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #   environment:
-  #     - PMA_ARBITRARY=1
-  #     - PMA_HOSTS=bihin-db
-  #   ports:
-  #     - "45050:80"
-  # swagger-ui:
-  #   image: swaggerapi/swagger-ui
-  #   ports:
-  #     - "48081:8080"
-  #   volumes:
-  #     - ./open-api.yaml:/data/openapi.yaml
-  #   environment:
-  #     SWAGGER_JSON: /data/openapi.yaml
+  db:
+    container_name: db_go
+    build: ./docker/db
+    platform: linux/amd64
+    ports:
+      - "43306:3306"
+    environment:
+      MYSQL_DATABASE: tweeter
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - "./docker/.data/log:/var/log/mysqllog"
+      - "./docker/db/tables:/docker-entrypoint-initdb.d"
+    restart: on-failure
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-proot"
+        ]
+      interval: 5s
+      retries: 5
+  phpmyadmin:
+    container_name: tweeter-phpmyadmin_go
+    image: phpmyadmin
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=bihin-db
+    ports:
+      - "45050:80"
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "48081:8080"
+    volumes:
+      - ./open-api.yaml:/data/openapi.yaml
+    environment:
+      SWAGGER_JSON: /data/openapi.yaml
