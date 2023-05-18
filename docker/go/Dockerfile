@@ -1,11 +1,15 @@
 FROM golang:1.19.3-alpine
 ENV GOPATH=
 
-RUN apk update && apk add git
-
 WORKDIR /go
 
-RUN apk update && apk add git
-# RUN go get github.com/gin-gonic/gin
+ENV GO111MODULE=on
 
-# CMD ["go", "mod", "init", "go-test", "&&", "go", "get", "github.com/gin-gonic/gin", "&&" ,"go", "run", "main.go"]
+RUN apk update && apk add git
+RUN go install github.com/cosmtrek/air@latest
+# RUN go mod init \
+# && go mod tidy \
+# && go build
+
+
+CMD ["air", "-c", ".air.toml"]

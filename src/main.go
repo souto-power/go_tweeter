@@ -1,17 +1,18 @@
-package main 
+package main
 
 import (
-    "github.com/gin-gonic/gin"
+	"net/http"
+
+	"github.com/labstack/echo"
+
+	"fmt"
 )
 
 func main() {
-    router := gin.Default()
-
-    router.GET("/", func(c *gin.Context) {
-        c.JSON(200, gin.H{
-            "message": "Hello World",
-        })
-    })
-
-    router.Run(":8080")
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, world!")
+	})
+	e.Logger.Fatal(e.Start(":8080"))
+	fmt.Println("aaa")
 }
